@@ -7,6 +7,7 @@ import { Parcel, ParcelService } from '../src/Parcel'
 import { Publication } from '../src/Publication'
 import { asyncBatch } from '../src/lib'
 import { parseCLICoords, loadEnv } from './utils'
+import { PUBLICATION_STATUS } from '../shared/publication'
 
 const log = new Log('sanity-check')
 
@@ -95,7 +96,7 @@ async function checkParcel(parcel) {
         contractId
       )
     }
-  } else if (publication && publication.status === Publication.STATUS.open) {
+  } else if (publication && publication.status === PUBLICATION_STATUS.open) {
     // Check for hanging publication in db
     log.info(id, 'open in db and null in blockchain')
   }

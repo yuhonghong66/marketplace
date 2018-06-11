@@ -5,7 +5,7 @@ import { db } from '../database'
 import { Parcel, ParcelService } from '../Parcel'
 import { Publication } from '../Publication'
 
-import { PUBLICATION_STATUS } from '../shared/asset'
+import { PUBLICATION_STATUS } from '../shared/publication'
 import { ASSET_TYPE } from '../shared/asset'
 import { Asset } from './Asset'
 

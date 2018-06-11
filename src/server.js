@@ -17,7 +17,7 @@ import { MapRouter } from './Map'
 
 env.load()
 
-const SERVER_PORT = env.get('SERVER_PORT', 5000)
+const SERVER_PORT = env.get('SERVER_PORT', 5001)
 
 const app = express()
 const httpServer = http.Server(app)

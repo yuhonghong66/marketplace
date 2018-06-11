@@ -2,6 +2,7 @@ import { Model } from 'decentraland-commons'
 import { BlockchainEvent } from '../BlockchainEvent'
 import { ASSET_TYPE } from '../Asset'
 import { SQL } from '../database'
+import { PUBLICATION_STATUS } from '../shared/publication'
 
 export class Publication extends Model {
   static tableName = 'publications'
@@ -23,14 +24,8 @@ export class Publication extends Model {
     'contract_id'
   ]
 
-  static STATUS = Object.freeze({
-    open: 'open',
-    sold: 'sold',
-    cancelled: 'cancelled'
-  })
-
   static isValidStatus(status) {
-    return Object.values(this.STATUS).includes(status)
+    return Object.values(PUBLICATION_STATUS).includes(status)
   }
 
   static isValidType(type) {

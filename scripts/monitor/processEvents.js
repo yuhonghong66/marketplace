@@ -8,6 +8,8 @@ import { Mortgage } from '../../src/Mortgage'
 import { MarketplaceEvent } from '../../src/MarketplaceEvent'
 import { isDuplicatedConstraintError } from '../../src/database'
 import { ASSET_TYPE } from '../../src/Asset'
+import { PUBLICATION_STATUS } from '../../shared/publication'
+import { MORTGAGE_STATUS } from '../../shared/mortgage'
 
 const log = new Log('processEvents')
 
@@ -52,7 +54,7 @@ async function processNoParcelRelatedEvents(event) {
         log.info(`[${name}] Cancelling Mortgage ${_id}`)
         await Mortgage.update(
           {
-            status: Mortgage.STATUS.cancelled,
+            status: MORTGAGE_STATUS.cancelled,
             block_time_updated_at
           },
           { mortgage_id: _id }
@@ -74,7 +76,7 @@ async function processNoParcelRelatedEvents(event) {
         log.info(`[${name}] Starting Mortgage ${_id}`)
         await Mortgage.update(
           {
-            status: Mortgage.STATUS.ongoing,
+            status: MORTGAGE_STATUS.ongoing,
             block_time_updated_at
           },
           { mortgage_id: _id }
@@ -117,7 +119,7 @@ async function processNoParcelRelatedEvents(event) {
       log.info(`[${name}] Total Payment Mortgage for loan ${_index}`)
       await Mortgage.update(
         {
-          status: Mortgage.STATUS.paid,
+          status: MORTGAGE_STATUS.paid,
           outstanding_amount: 0,
           block_time_updated_at
         },
@@ -133,7 +135,7 @@ async function processNoParcelRelatedEvents(event) {
       log.info(`[${name}] Claimed Mortgage ${_id}`)
       await Mortgage.update(
         {
-          status: Mortgage.STATUS.claimed,
+          status: MORTGAGE_STATUS.claimed,
           block_time_updated_at
         },
         { mortgage_id: _id }
@@ -148,7 +150,7 @@ async function processNoParcelRelatedEvents(event) {
       log.info(`[${name}] Defaulted Mortgage ${_id}`)
       await Mortgage.update(
         {
-          status: Mortgage.STATUS.defaulted,
+          status: MORTGAGE_STATUS.defaulted,
           block_time_updated_at
         },
         { mortgage_id: _id }
@@ -195,14 +197,14 @@ async function processParcelRelatedEvents(assetId, event) {
         Publication.delete({
           asset_id: parcelId,
           owner: seller.toLowerCase(),
-          status: Publication.STATUS.open
+          status: PUBLICATION_STATUS.open
         })
       ])
 
       try {
         await Publication.insert({
           tx_status: txUtils.TRANSACTION_STATUS.confirmed,
-          status: Publication.STATUS.open,
+          status: PUBLICATION_STATUS.open,
           owner: seller.toLowerCase(),
           buyer: null,
           price: eth.utils.fromWei(priceInWei),
@@ -241,7 +243,7 @@ async function processParcelRelatedEvents(assetId, event) {
       await Promise.all([
         Publication.update(
           {
-            status: Publication.STATUS.sold,
+            status: PUBLICATION_STATUS.sold,
             buyer: winner.toLowerCase(),
             price: eth.utils.fromWei(totalPrice),
             block_time_updated_at
@@ -266,7 +268,7 @@ async function processParcelRelatedEvents(assetId, event) {
       )
 
       await Publication.update(
-        { status: Publication.STATUS.cancelled, block_time_updated_at },
+        { status: PUBLICATION_STATUS.cancelled, block_time_updated_at },
         { contract_id }
       )
       break
@@ -333,7 +335,7 @@ async function processParcelRelatedEvents(assetId, event) {
       try {
         await Mortgage.insert({
           tx_status: txUtils.TRANSACTION_STATUS.confirmed,
-          status: Mortgage.STATUS.pending,
+          status: MORTGAGE_STATUS.pending,
           is_due_at: duesIn.toNumber(),
           payable_at: payableAt.toNumber(),
           expires_at: expiresAt.toNumber(),

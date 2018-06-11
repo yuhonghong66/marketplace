@@ -4,8 +4,11 @@ import { PUBLICATION_STATUS } from './publication'
 
 export const MORTGAGE_STATUS = Object.freeze({
   pending: 'pending',
+  cancelled: 'cancelled',
   ongoing: 'ongoing',
-  paid: 'paid'
+  paid: 'paid',
+  defaulted: 'defaulted',
+  claimed: 'claimed'
 })
 
 export const isMortgagePending = mortgage =>

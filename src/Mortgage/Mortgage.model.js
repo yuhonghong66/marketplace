@@ -26,15 +26,6 @@ export class Mortgage extends Model {
   ]
   static primaryKey = 'tx_hash'
 
-  static STATUS = Object.freeze({
-    pending: 'pending',
-    cancelled: 'cancelled',
-    ongoing: 'ongoing',
-    paid: 'paid',
-    defaulted: 'defaulted',
-    claimed: 'claimed'
-  })
-
   static findByBorrower(borrower, status) {
     return this.db.query(
       SQL`SELECT * FROM ${raw(this.tableName)}

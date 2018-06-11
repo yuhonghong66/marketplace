@@ -1,7 +1,8 @@
 import { Mortgage } from '../src/Mortgage'
+import { MORTGAGE_STATUS } from '../shared/mortgage'
 
 const tableName = Mortgage.tableName
-const mortgageStatus = Object.values(Mortgage.STATUS)
+const mortgageStatus = Object.values(MORTGAGE_STATUS)
   .map(val => `'${val}'`)
   .join(', ')
 

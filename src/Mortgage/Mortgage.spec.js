@@ -18,7 +18,7 @@ describe('Mortgage', function() {
     mortgage = {
       tx_hash: '1xdeadbeef',
       tx_status: txUtils.TRANSACTION_STATUS.confirmed,
-      status: Mortgage.STATUS.pending,
+      status: MORTGAGE_STATUS.pending,
       loan_id: 0,
       mortgage_id: 0,
       asset_id: Parcel.buildId(2, 5),

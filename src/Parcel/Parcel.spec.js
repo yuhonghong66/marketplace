@@ -113,7 +113,7 @@ describe('Parcel', function() {
       const publication = {
         tx_hash: '0xdeadbeef',
         tx_status: txUtils.TRANSACTION_STATUS.confirmed,
-        status: Publication.STATUS.open,
+        status: PUBLICATION_STATUS.open,
         type: ASSET_TYPE.parcel,
         asset_id: '2,5',
         owner: '0xdeadbeef33',
@@ -129,7 +129,7 @@ describe('Parcel', function() {
       const publication2 = {
         tx_hash: '0xdeadabeef',
         tx_status: txUtils.TRANSACTION_STATUS.confirmed,
-        status: Publication.STATUS.open,
+        status: PUBLICATION_STATUS.open,
         type: ASSET_TYPE.parcel,
         asset_id: '6,5',
         owner: '0xdeadbeef33',
