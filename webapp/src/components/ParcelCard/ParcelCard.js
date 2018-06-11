@@ -9,11 +9,12 @@ import ParcelPreview from 'components/ParcelPreview'
 import Expiration from 'components/Expiration'
 import ParcelTags from 'components/ParcelTags'
 import { parcelType } from 'components/types'
-import { AUCTION_DATE } from 'lib/parcelUtils'
-import { isPublicationOpen } from 'modules/publication/utils'
-import { isMortgageActive } from 'modules/mortgage/utils'
 import { t } from 'modules/translation/utils'
-import { formatDate, buildCoordinate } from 'lib/utils'
+import { AUCTION_DATE, buildCoordinate } from 'shared/parcel'
+import { isOpen } from 'shared/publication'
+import { isMortgageActive } from 'shared/mortgage'
+import { formatDate } from 'lib/utils'
+
 import './ParcelCard.css'
 
 export default class ParcelCard extends React.PureComponent {
@@ -44,12 +45,12 @@ export default class ParcelCard extends React.PureComponent {
           <Card.Content className="body">
             <Card.Description title={parcelName}>
               <span className="name">{parcelName}</span>
-              {isPublicationOpen(publication) ? (
+              {isOpen(publication) ? (
                 <Mana amount={parseFloat(publication.price)} />
               ) : null}
             </Card.Description>
 
-            {isPublicationOpen(publication) && (
+            {isOpen(publication) && (
               <React.Fragment>
                 <Card.Meta
                   title={formatDate(parseInt(publication.expires_at, 10))}
@@ -61,7 +62,7 @@ export default class ParcelCard extends React.PureComponent {
               </React.Fragment>
             )}
 
-            {!isPublicationOpen(publication) &&
+            {!isOpen(publication) &&
               !showMortgage && (
                 <Card.Meta>
                   {t('global.acquired_at', {
