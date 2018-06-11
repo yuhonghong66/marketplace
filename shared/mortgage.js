@@ -2,7 +2,6 @@ import { eth } from 'decentraland-eth'
 import { isOpen, hasStatus } from 'lib/utils'
 import { PUBLICATION_STATUS } from 'modules/publication/utils'
 
-// From Mortgage.js on the server
 export const MORTGAGE_STATUS = Object.freeze({
   pending: 'pending',
   ongoing: 'ongoing',

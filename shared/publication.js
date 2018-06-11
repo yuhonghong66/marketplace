@@ -1,11 +1,14 @@
-import { isOpen } from 'lib/utils'
+import { hasStatus } from './asset'
 
-// From Publication.js on the server
 export const PUBLICATION_STATUS = Object.freeze({
   open: 'open',
   sold: 'sold',
   cancelled: 'cancelled'
 })
+
+export function isOpen(publication) {
+  return hasStatus(publication, PUBLICATION_STATUS.open)
+}
 
 export function toPublicationsObject(publicationsArray) {
   return publicationsArray.reduce(
