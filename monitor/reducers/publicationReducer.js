@@ -54,7 +54,8 @@ async function reduceMarketplace(event) {
   switch (name) {
     case eventNames.AuctionCreated:
     case eventNames.OrderCreated: {
-      const { seller, priceInWei, expiresAt } = event.args
+      const { priceInWei, expiresAt } = event.args
+      const owner = event.args.seller.toLowerCase()
       const contract_id = event.args.id
 
       if (!contract_id) {
@@ -70,9 +71,13 @@ async function reduceMarketplace(event) {
       await Publication.delete({
         asset_id: assetId,
         asset_type: assetType,
-        owner: seller.toLowerCase(),
-        status: PUBLICATION_STATUS.open
+        status: PUBLICATION_STATUS.open,
+        owner
       })
+      await Publication.update(
+        { is_latest: false },
+        { asset_id: assetId, asset_type: assetType }
+      )
 
       try {
         await Publication.insert({
@@ -81,11 +86,12 @@ async function reduceMarketplace(event) {
           marketplace_address: address,
           status: PUBLICATION_STATUS.open,
           tx_status: txUtils.TRANSACTION_TYPES.confirmed,
-          owner: seller.toLowerCase(),
           buyer: null,
           price: eth.utils.fromWei(priceInWei),
           expires_at: expiresAt,
           block_time_created_at: blockTime,
+          is_latest: true,
+          owner,
           tx_hash,
           block_number,
           contract_id

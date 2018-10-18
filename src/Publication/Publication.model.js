@@ -23,8 +23,10 @@ export class Publication extends Model {
     'expires_at',
     'block_time_created_at',
     'block_time_updated_at',
-    'contract_id'
+    'contract_id',
+    'is_latest'
   ]
+
   static isValidStatus(status) {
     return Object.values(PUBLICATION_STATUS).includes(status)
   }

@@ -11,3 +11,7 @@ const BLACKLISTED_PROPERTIES = [
 export function sanitizeDistricts(districts) {
   return utils.mapOmit(districts, BLACKLISTED_PROPERTIES)
 }
+
+export function sanitizeDistrictProps(props) {
+  return props.filter(prop => !BLACKLISTED_PROPERTIES.includes(prop))
+}

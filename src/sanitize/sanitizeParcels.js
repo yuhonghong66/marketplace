@@ -9,3 +9,7 @@ export function sanitizeParcels(parcels) {
 export function sanitizeParcel(parcel) {
   return utils.omit(parcel, BLACKLISTED_PROPERTIES)
 }
+
+export function sanitizeParcelProps(props) {
+  return props.filter(prop => !BLACKLISTED_PROPERTIES.includes(prop))
+}

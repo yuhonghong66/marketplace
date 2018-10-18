@@ -9,3 +9,7 @@ export function sanitizeEstates(estates) {
 export function sanitizeEstate(estate) {
   return utils.omit(estate, BLACKLISTED_PROPERTIES)
 }
+
+export function sanitizeEstateProps(props) {
+  return props.filter(prop => !BLACKLISTED_PROPERTIES.includes(prop))
+}

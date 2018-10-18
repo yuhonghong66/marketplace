@@ -1,11 +1,13 @@
 import { Model } from 'decentraland-commons'
 
-import { Asset } from '../Asset'
-import { PublicationQueries } from '../../Publication'
+import { Publication, PublicationQueries } from '../../Publication'
 import { District } from '../../District'
 import { MortgageQueries } from '../../Mortgage'
-import { SQL } from '../../database'
+import { SQL, raw } from '../../database'
 import { coordinates } from '../../lib'
+import { sanitizeParcelProps, sanitizePublicationProps } from '../../sanitize'
+import { isExpired } from '../../shared/asset'
+import { Asset } from '../Asset'
 
 export class Parcel extends Model {
   static tableName = 'parcels'
@@ -60,7 +62,7 @@ export class Parcel extends Model {
   static async findOwneableParcels() {
     return this.db.query(
       SQL`SELECT *
-        FROM ${SQL.raw(this.tableName)}
+        FROM ${raw(this.tableName)}
         WHERE district_id IS NULL`
     )
   }
@@ -68,7 +70,7 @@ export class Parcel extends Model {
   static async findLandmarks() {
     return this.db.query(
       SQL`SELECT *
-        FROM ${SQL.raw(this.tableName)}
+        FROM ${raw(this.tableName)}
         WHERE district_id IS NOT NULL`
     )
   }
@@ -78,7 +80,7 @@ export class Parcel extends Model {
       SQL`SELECT *, (
         ${PublicationQueries.findLastAssetPublicationJsonSql(this.tableName)}
       ) as publication
-        FROM ${SQL.raw(this.tableName)}
+        FROM ${raw(this.tableName)}
         WHERE EXISTS(${MortgageQueries.findLastByBorrowerSql(borrower)})`
     )
   }
@@ -89,19 +91,37 @@ export class Parcel extends Model {
     const [maxx, miny] =
       typeof max === 'string' ? coordinates.toArray(max) : [max.x, max.y]
 
-    return this.db.query(SQL`SELECT *, (
-      ${PublicationQueries.findLastAssetPublicationJsonSql(this.tableName)}
-    ) as publication
-      FROM ${SQL.raw(this.tableName)}
-      WHERE x BETWEEN ${minx} AND ${maxx}
-        AND y BETWEEN ${miny} AND ${maxy}
-      ORDER BY x ASC, y DESC`)
+    // Perf improvement: We filter columns via sanitize to improve SQL performance.
+    // It's a double edge sword, as we're not returning the entire dataset always. So be careful when debugging here.
+    // Also keep in mind that we moved the expired check to JS (below the query) in an effort to make things faster
+
+    const parcelProps = sanitizeParcelProps(Parcel.columnNames).map(
+      columnName => `p.${columnName}`
+    )
+    const publicationProps = sanitizePublicationProps(
+      Publication.columnNames
+    ).map(columnName => `pub.${columnName}`)
+
+    // prettier-ignore
+    const parcels = await this.db.query(
+      SQL`SELECT ${raw(parcelProps)}, row_to_json(row(${raw(publicationProps)})) as publication
+        FROM ${raw(this.tableName)} AS p
+        LEFT JOIN ${raw(Publication.tableName)} AS pub ON p.id = pub.asset_id AND pub.is_latest = true
+        WHERE x BETWEEN ${minx} AND ${maxx}
+          AND y BETWEEN ${miny} AND ${maxy}
+        ORDER BY x ASC, y DESC`
+    )
+    const result = parcels.filter(
+      ({ publication }) => !publication || !isExpired(publication.expires_at)
+    )
+
+    return result
   }
 
   static async encodeTokenId(x, y) {
     const rows = await this.db.query(
       SQL`SELECT token_id
-        FROM ${SQL.raw(this.tableName)}
+        FROM ${raw(this.tableName)}
         WHERE x = ${x}
           AND y = ${y}
         LIMIT 1`
@@ -112,7 +132,7 @@ export class Parcel extends Model {
   static async decodeTokenId(tokenId) {
     const rows = await this.db.query(
       SQL`SELECT id
-        FROM ${SQL.raw(this.tableName)}
+        FROM ${raw(this.tableName)}
         WHERE token_id = ${tokenId}
         LIMIT 1`
     )
