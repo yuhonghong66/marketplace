@@ -133,7 +133,7 @@ describe('Marketplace', function() {
             contract_id: '0x4',
             price: 40,
             buyer: null,
-            is_latest: null,
+            is_latest: false,
             status: PUBLICATION_STATUS.open,
             asset_type: ASSET_TYPES.parcel,
             asset_id: '1,2',
